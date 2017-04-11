@@ -98,11 +98,11 @@ class RemotePowerShellOverWmiTest(TestCase):
     @wrap_case("ทดสอบ")
     @wrap_case("परीक्षण")
     def test_1st_nonascii_char_through_stdin(self, text):
-        ps_code = ";".join([
-            "[Console]::InputEncoding = New-Object System.Text.UTF8Encoding",
-            "$c = [Console]::In.Read()",
-            "[Console]::Out.Write($c)",
-        ])
+        ps_code = (
+            "[Console]::InputEncoding ="
+            " New-Object System.Text.UTF8Encoding $True;"
+            "$c = [Console]::In.Read(); [Console]::Out.Write($c)"
+        )
         r = RPSoWMI(WMI(), logfile=self.logfile.name).execute(ps_code, text)
         self.assertEqual(r.code, 0, r)
         self.assertEqual(r.stdout.rstrip("\r\n"), str(ord(text[0])), r)
