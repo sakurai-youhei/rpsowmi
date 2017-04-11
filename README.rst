@@ -20,12 +20,13 @@ For more details, read pydoc of rpsowmi.RemotePowerShellOverWmi.
 
 * Line separators (CR, LF and CRLF) are unified to `\\n` (LF) somewhere in communication between RPSoWMI and your PowerShell code being executed on remote machine.
 
-**Versions History**
+**Version history**
 
 * v2017.4.11: Initial release while leaving one limitation that max length of your PowerShell code has to be up to around 2,800 characters.
 
-|Build status|
+**Links**
 
+|Build status|
 * https://pypi.python.org/pypi/rpsowmi
 * https://testpypi.python.org/pypi/rpsowmi
 
