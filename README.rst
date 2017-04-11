@@ -18,11 +18,13 @@ For more details, read pydoc of rpsowmi.RemotePowerShellOverWmi.
 
 **Known problems**
 
-* Line separators (CR, LF and CRLF) are unified to `\\n` (LF) somewhere in communication between RPSoWMI and your PowerShell code being executed on remote machine.
+* Length of your PowerShell code is limited up to around 2,800 characters because the code is tranfered as a part of command line arguments.
+* Line separators - CR, LF and CRLF are unified to LF (`\\n`) somewhere in communication between RPSoWMI and your PowerShell code.
+* Line separator - LF (`\\n`) may be appended to STDOUT and STDERR even though your PowerShell code doesn't do it.
 
 **Version history**
 
-* v2017.4.11: Initial release while leaving one limitation that max length of your PowerShell code has to be up to around 2,800 characters.
+* v2017.4.11: Initial release.
 
 **Links**
 
