@@ -1,0 +1,7 @@
+docutils
+flake8
+hacking
+mock
+python_wrap_cases
+pywin32
+WMI
