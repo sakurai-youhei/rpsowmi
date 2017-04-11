@@ -1,0 +1,110 @@
+environment:
+
+  matrix:
+
+####
+# Because of https://bugs.python.org/issue23063
+#    - PYTHON: "C:\\Python33"
+#      PYTHON_VERSION: "3.3"
+#      PYTHON_ARCH: "win32"
+
+####
+# Because of https://bugs.python.org/issue23063
+#    - PYTHON: "C:\\Python33-x64"
+#      PYTHON_VERSION: "3.3"
+#      PYTHON_ARCH: "win-amd64"
+
+    - PYTHON: "C:\\Python34"
+      PYTHON_VERSION: "3.4"
+      PYTHON_ARCH: "win32"
+
+    - PYTHON: "C:\\Python34-x64"
+      PYTHON_VERSION: "3.4"
+      PYTHON_ARCH: "win-amd64"
+
+    - PYTHON: "C:\\Python35"
+      PYTHON_VERSION: "3.5"
+      PYTHON_ARCH: "win32"
+
+    - PYTHON: "C:\\Python35-x64"
+      PYTHON_VERSION: "3.5"
+      PYTHON_ARCH: "win-amd64"
+
+    - PYTHON: "C:\\Python36"
+      PYTHON_VERSION: "3.6"
+      PYTHON_ARCH: "win32"
+
+    - PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "3.6"
+      PYTHON_ARCH: "win-amd64"
+
+  PYPIUSERNAME:
+
+    secure: 9PcMMf9KccpsdTeMp+2m+A==
+
+  PYPIPASSWORD:
+
+    secure: BU3VwuaiD1GnvjsIr3wnhcmHHNeYdukKgq6N2/uY7Zo=
+
+  PYPITESTUSERNAME:
+
+    secure: 9PcMMf9KccpsdTeMp+2m+A==
+
+  PYPITESTPASSWORD:
+
+    secure: BU3VwuaiD1GnvjsIr3wnhcmHHNeYdukKgq6N2/uY7Zo=
+
+  PYPI: pypitest
+
+install:
+
+  - ps: "ls \"C:/Python*\""
+
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  - "python -c \"import sys; sys.stdout.write(sys.version);\""
+  - "pip --version"
+  - "easy_install --version"
+  - "pip freeze"
+
+build_script:
+
+  - "python setup.py clean build"
+
+before_test:
+
+  - "pip download https://sourceforge.net/projects/pywin32/files/pywin32/Build%20220/pywin32-220.%PYTHON_ARCH%-py%PYTHON_VERSION%.exe || exit /b 0"
+  - "easy_install pywin32-220.%PYTHON_ARCH%-py%PYTHON_VERSION%.exe"
+  - "pip install -r requirements-dev.txt"
+
+test_script:
+
+  - "python setup.py test"
+  - "python setup.py check -m -r -s"
+  - "python -m flake8"
+
+after_test:
+
+  # Prepare .pypirc to upload packages to PyPI
+  - "echo.                                               > %USERPROFILE%\\.pypirc"
+  - "echo [distutils]                                   >> %USERPROFILE%\\.pypirc"
+  - "echo index-servers=                                >> %USERPROFILE%\\.pypirc"
+  - "echo     pypi                                      >> %USERPROFILE%\\.pypirc"
+  - "echo     pypitest                                  >> %USERPROFILE%\\.pypirc"
+  - "echo [pypi]                                        >> %USERPROFILE%\\.pypirc"
+  - "echo repository = https://pypi.python.org/pypi     >> %USERPROFILE%\\.pypirc"
+  - "echo username = %PYPIUSERNAME%                     >> %USERPROFILE%\\.pypirc"
+  - "echo password = %PYPIPASSWORD%                     >> %USERPROFILE%\\.pypirc"
+  - "echo [pypitest]                                    >> %USERPROFILE%\\.pypirc"
+  - "echo repository = https://testpypi.python.org/pypi >> %USERPROFILE%\\.pypirc"
+  - "echo username = %PYPITESTUSERNAME%                 >> %USERPROFILE%\\.pypirc"
+  - "echo password = %PYPITESTPASSWORD%                 >> %USERPROFILE%\\.pypirc"
+
+  # Determine if building target is a tag which name starts with 'v0', 'v1', ... or 'v9'
+  - "echo %APPVEYOR_REPO_TAG_NAME% | findstr /B \"v[0-9]\" && set PYPI=pypi || exit /b 0"
+
+  - "python setup.py register -r %PYPI: =%"
+  - "python setup.py sdist upload -r %PYPI: =% || exit 0"
+  - ps: "ls dist"
+
+#artifacts:
+#on_success:
