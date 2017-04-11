@@ -84,9 +84,25 @@ class RemotePowerShellOverWmiTest(TestCase):
     @wrap_case("\r")
     @wrap_case("\r\n")
     @wrap_case("\r\n\r\r\n")
-    @wrap_case("テスト")
-    def test_1st_char_through_stdin(self, text):
+    @wrap_case("a\rb\nc")
+    def test_1st_ascii_char_through_stdin(self, text):
         ps_code = "$c = [Console]::In.Read(); [Console]::Out.Write($c)"
+        r = RPSoWMI(WMI(), logfile=self.logfile.name).execute(ps_code, text)
+        self.assertEqual(r.code, 0, r)
+        self.assertEqual(r.stdout.rstrip("\r\n"), str(ord(text[0])), r)
+
+    @wrap_case("テスト")
+    @wrap_case("测试")
+    @wrap_case("próf")
+    @wrap_case("테스트")
+    @wrap_case("ทดสอบ")
+    @wrap_case("परीक्षण")
+    def test_1st_nonascii_char_through_stdin(self, text):
+        ps_code = ";".join([
+            "[Console]::InputEncoding = New-Object System.Text.UTF8Encoding",
+            "$c = [Console]::In.Read()",
+            "[Console]::Out.Write($c)",
+        ])
         r = RPSoWMI(WMI(), logfile=self.logfile.name).execute(ps_code, text)
         self.assertEqual(r.code, 0, r)
         self.assertEqual(r.stdout.rstrip("\r\n"), str(ord(text[0])), r)
