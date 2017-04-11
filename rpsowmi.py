@@ -44,7 +44,6 @@ Write-Log "* NPIPE_IN: {NPIPE_IN}"
 Write-Log "* NPIPE_OUT: {NPIPE_OUT}"
 Write-Log "* LOGFILE: {LOGFILE}"
 Write-Log "* EXEC: {EXEC}"
-Write-Log "* ARGS: {ARGS}"
 Write-Log "* TIMEOUT: {TIMEOUT}"
 Write-Log "* ENCODING: {ENCODING}"
 Write-Log "* CODE_ON_EXC: {CODE_ON_EXC}"
@@ -53,6 +52,8 @@ $psi = New-Object System.Diagnostics.ProcessStartInfo
 $psi.CreateNoWindow = $true
 $psi.LoadUserProfile = $false
 $psi.UseShellExecute = $false
+$psi.StandardOutputEncoding = {ENCODING}
+$psi.StandardErrorEncoding = {ENCODING}
 $psi.RedirectStandardInput = $true
 $psi.RedirectStandardOutput = $true
 $psi.RedirectStandardError = $true
@@ -62,16 +63,12 @@ $psi.Arguments = "{ARGS}"
 Write-Log "[{NPIPE_IN}] Opening"
 $npipe_in = New-Object System.IO.Pipes.NamedPipeClientStream(
     "{NPIPE_HOST}", "{NPIPE_IN}", [System.IO.Pipes.PipeDirection]::In)
-Write-Log "[{NPIPE_IN}] Connecting"
 $npipe_in.Connect({TIMEOUT})
-Write-Log "[{NPIPE_IN}] Established"
 
 Write-Log "[{NPIPE_OUT}] Opening"
 $npipe_out = New-Object System.IO.Pipes.NamedPipeClientStream(
     "{NPIPE_HOST}", "{NPIPE_OUT}", [System.IO.Pipes.PipeDirection]::Out)
-Write-Log "[{NPIPE_OUT}] Connecting"
 $npipe_out.Connect({TIMEOUT})
-Write-Log "[{NPIPE_OUT}] Established"
 
 $proc = New-Object System.Diagnostics.Process
 $proc.StartInfo = $psi
@@ -102,7 +99,10 @@ $proc.BeginOutputReadLine()
 $proc.BeginErrorReadLine()
 
 $reader = New-Object System.IO.StreamReader($npipe_in, {ENCODING})
-$proc.StandardInput.Write($reader.ReadToEnd())
+$proc_stdin = New-Object System.IO.StreamWriter(
+    $proc.StandardInput.BaseStream, {ENCODING})
+$proc_stdin.Write($reader.ReadToEnd())
+$proc_stdin.Flush()
 $proc.StandardInput.Close()
 $reader.Close()
 Write-Log "[{NPIPE_IN}] Closed"
@@ -297,11 +297,15 @@ class RemotePowerShellOverWmi(object):
         self.logfile = logfile
         self.code_on_exc = code_on_exc
         self.logger = logger
-        self.encoding = "utf-8-sig"
+        self.encoding = "utf-8"
         self.ps_cmd = "powershell.exe"
         self.ps_opts = "-NonInteractive -NoProfile -NoLogo -encodedCommand"
         self.no_stdin = "-InputFormat none"
-        self.ps_encoding = "(New-Object System.Text.UTF8Encoding $True)"
+        self.ps_encoding = "[System.Text.Encoding]::UTF8"
+        self.ps_prepend = (
+            "[Console]::OutputEncoding = {ENCODING};"
+            "[Console]::InputEncoding = {ENCODING};"
+        )
         self.npipe_in = r"\\.\pipe\%s" % uuid4()
         self.npipe_out = r"\\.\pipe\%s" % uuid4()
 
@@ -401,9 +405,11 @@ class RemotePowerShellOverWmi(object):
 
         :raises concurrent.futures.TimeoutError: Timeout on local host.
         """
+        ps_code_encoded = self.encode_ps_code(
+            self.ps_prepend.format(ENCODING=self.ps_encoding) + ps_code)
         wrapper = self.encode_ps_code(RPSOWMI_PS1.format(
             EXEC=self.ps_cmd,
-            ARGS=" ".join([self.ps_opts, self.encode_ps_code(ps_code)]),
+            ARGS=" ".join([self.ps_opts, ps_code_encoded]),
             NPIPE_HOST=self.localhost,
             NPIPE_IN=self.npipe_in.rsplit("\\", 1)[-1],
             NPIPE_OUT=self.npipe_out.rsplit("\\", 1)[-1],

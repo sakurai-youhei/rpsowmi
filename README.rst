@@ -22,7 +22,7 @@ For more details, read pydoc of rpsowmi.RemotePowerShellOverWmi.
 
 **Versions History**
 
-* v2017.4.11: Initial release while leaving one limitation that max length of your PowerShell code has to be up to around 1,400 characters.
+* v2017.4.11: Initial release while leaving one limitation that max length of your PowerShell code has to be up to around 2,800 characters.
 
 |Build status|
 
