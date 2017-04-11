@@ -73,7 +73,7 @@ build_script:
 before_test:
 
   - 'pip download "https://sourceforge.net/projects/pywin32/files/pywin32/Build 220/pywin32-220.%PYTHON_ARCH%-py%PYTHON_VERSION%.exe" || exit /b 0'
-  - "easy_install pywin32-220.%PYTHON_ARCH%-py%PYTHON_VERSION%.exe"
+  - "easy_install pywin32-220.%PYTHON_ARCH%-py%PYTHON_VERSION%.exe || exit /b 0"  # PermissionError sometimes occurs.
   - "pip install -r requirements-dev.txt"
 
 test_script:
