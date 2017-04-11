@@ -28,7 +28,7 @@ setup(
     name=rpsowmi.__name__,
     license=rpsowmi.__license__,
     url="https://github.com/sakurai-youhei/rpsowmi",
-    description=long_description.splitlines()[3].strip(),
+    description="Remote PowerShell over WMI (RPSoWMI)",
     long_description=long_description,
     classifiers=classifiers,
     keywords=keywords,

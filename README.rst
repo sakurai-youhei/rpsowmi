@@ -26,5 +26,8 @@ For more details, read pydoc of rpsowmi.RemotePowerShellOverWmi.
 
 |Build status|
 
+* https://pypi.python.org/pypi/rpsowmi
+* https://testpypi.python.org/pypi/rpsowmi
+
 .. |Build status| image:: https://img.shields.io/appveyor/ci/sakurai_youhei/rpsowmi/master.svg?label=Build%20and%20test%20on%20Python%203.4%20to%203.6
    :target: https://ci.appveyor.com/project/sakurai_youhei/rpsowmi/branch/master
