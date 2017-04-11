@@ -27,6 +27,7 @@ For more details, read pydoc of rpsowmi.RemotePowerShellOverWmi.
 **Links**
 
 |Build status|
+
 * https://pypi.python.org/pypi/rpsowmi
 * https://testpypi.python.org/pypi/rpsowmi
 
