@@ -72,7 +72,7 @@ build_script:
 
 before_test:
 
-  - "pip download https://sourceforge.net/projects/pywin32/files/pywin32/Build%20220/pywin32-220.%PYTHON_ARCH%-py%PYTHON_VERSION%.exe || exit /b 0"
+  - "pip download https://sourceforge.net/projects/pywin32/files/pywin32/Build%%20220/pywin32-220.%PYTHON_ARCH%-py%PYTHON_VERSION%.exe || exit /b 0"
   - "easy_install pywin32-220.%PYTHON_ARCH%-py%PYTHON_VERSION%.exe"
   - "pip install -r requirements-dev.txt"
 
