@@ -1,7 +1,7 @@
 Remote PowerShell over WMI
 --------------------------
 
-Remote PowerShell over WMI (RPSoWMI) enables you to run PowerShell code with support of STDIN, STDOUT, STDERR and return code on remote host through Windows Management Instrumentation (WMI).
+Remote PowerShell over WMI (RPSoWMI) enables you to run PowerShell code with support of STDIN, STDOUT, STDERR and return code through Windows Management Instrumentation (WMI) on remote host.
 
 Communication with your PowerShell code is done through 2 named pipes (one for outbound and another for inbound) being created on **executor's** machine, that means your access rights must be enough privileged not only for creation of new process on remote machine but also for access to the named pipes on executor's machine from remote machine.
 
@@ -18,7 +18,7 @@ For more details, read pydoc of rpsowmi.RemotePowerShellOverWmi.
 
 **Known problems**
 
-* Known problem: Line separators (CR, LF and CRLF) are unified to `\n` (LF) somewhere in communication between RPSoWMI and your PowerShell code being executed on remote machine.
+* Line separators (CR, LF and CRLF) are unified to `\\n` (LF) somewhere in communication between RPSoWMI and your PowerShell code being executed on remote machine.
 
 **Versions History**
 
